@@ -8,5 +8,7 @@ Works in Python 3.6+.
 
 ### Note
 
-This code has bene shown and worked upon in the Memory Forensics Workshop of
+This code has been shown and worked upon in/for the Memory Forensics Workshop of
 InFo-Conf 2018, Mar del Plata, Argentina.
+
+Special thanks to Gonzalo for helping me build it from scratch.
