@@ -1,6 +1,7 @@
 # nemo
 
-A simple tool to begin working in forensic memory analysis for beginners.
+A simple tool to begin working in forensic memory analysis, from zero to a
+working pslist().
 
 Code should be simple and asy to follow. Not particularly awesome code though.
 
