@@ -38,9 +38,9 @@ class ArchX86(AbstractArch):
         mem = self.mem
         dbase = mem.dirbase
         pdi, pti, offset = self.parse_vaddr(addr)
-        pde  = st.unpack(mem.read(dbase + pdi * 4, 4))[0]
+        pde, = st.unpack(mem.read(dbase + pdi * 4, 4))
         pde  = pde  & 0xfffff000 
-        pte  = st.unpack(mem.read(pde + pti * 4, 4))[0]
+        pte, = st.unpack(mem.read(pde   + pti * 4, 4))
         pte  = pte  & 0xfffff000
         paddr = pte + offset
         # Principalmente sirvieron para debugging, pero estos prints pueden
@@ -76,12 +76,12 @@ class ArchX86PAE(ArchX86):
         mem = self.mem
         dbase = mem.dirbase
         pdpi, pdi, pti, offset = self.parse_vaddr(addr)
-        pdpe = st.unpack(mem.read(dbase + pdpi * 8, 4))[0]
-        pdpe = pdpe & 0xfffff000
-        pde  = st.unpack(mem.read(pdpe + pdi * 8, 4))[0]
-        pde  = pde  & 0xfffff000 
-        pte  = st.unpack(mem.read(pde + pti * 8, 4))[0]
-        pte  = pte  & 0xfffff000
+        pdpe, = st.unpack(mem.read(dbase + pdpi * 8, 4))
+        pdpe  = pdpe & 0xfffff000
+        pde,  = st.unpack(mem.read(pdpe  + pdi  * 8, 4))
+        pde   = pde  & 0xfffff000 
+        pte,  = st.unpack(mem.read(pde   + pti  * 8, 4))
+        pte   = pte  & 0xfffff000
         paddr = pte + offset
         # Principalmente sirvieron para debugging, pero estos prints pueden
         # resultar útiles para ver cómo es la traducción de direcciones.
@@ -162,8 +162,8 @@ class CrashDump(AbstractDump):
         # punteros de interés e interpretar la lista de runs.
         raw_header = self.mem.read(4096)
         self._raw_header = raw_header
-        self.dirbase = self.st_uint32.unpack(raw_header[0x10: 0x14])[0]
-        self.process_head = self.st_uint32.unpack(raw_header[0x1c: 0x20])[0]
+        self.dirbase, = self.st_uint32.unpack(raw_header[0x10: 0x14])
+        self.process_head, = self.st_uint32.unpack(raw_header[0x1c: 0x20])
         runs = raw_header[0x64:0x320]
         st_parseruns = struct.Struct("<2L")
         self.ranges = []
@@ -277,9 +277,9 @@ class EProcess:
         self.base_addr = base_addr
         self.pcb = KProcess(rawdata[0x0: 0x98])
         self.active_process_links = ListEntry(rawdata[0xb8: 0xb8 + 8])
-        image_name = struct.unpack("<15s", rawdata[0x16c: 0x16c + 15])[0]
+        image_name, = struct.unpack("<15s", rawdata[0x16c: 0x16c + 15])
         self.image_name = (image_name.replace(b"\x00", b"")).decode("ascii")
-        self.pid = struct.unpack("<L", rawdata[0xb4: 0xb8])[0]
+        self.pid, = struct.unpack("<L", rawdata[0xb4: 0xb8])
         self.create_time = wintime(rawdata[0xa0: 0xa8])
         self.exit_time = wintime(rawdata[0xa8: 0xb0])
         
@@ -307,7 +307,7 @@ class KProcess:
     def __init__(self, rawdata):
         self.dispatcher_header = DispatcherHeader(rawdata[0x0: 0x10])
         self.profile_list_head = ListEntry(rawdata[0x10: 0x18])
-        self.directory_table_base = struct.unpack("<L", rawdata[0x18: 0x1c])[0]
+        self.directory_table_base, = struct.unpack("<L", rawdata[0x18: 0x1c])
     
     def __repr__(self):
         return "< KProcess >"
